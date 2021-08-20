@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<voicemail >
+    <!-- ======================= HolyDays innosrl 2010  =============================== -->
+<function define="Main">
+	<event type="timer" name="vbguard">
+		<pbx-disc /> 
+  	</event>
+	<timer name="vbguard" sec="10" /> 
+<!--  Systemzeit abfragen   --> 
+	<store-getstat root="" name="NULL"  out-mday="$mday" out-mon="$mon" />
+	<!--  Monat formatieren   --> 
+	<lib-strlen out="$res" string="$mon"/> 
+	<switch var="$res">
+  	   <case equal="1"> 
+               <lib-strcat out-string="$mon" string="0" string2="$mon"/>
+           </case>
+	</switch>
+<!--  Tag formatieren   --> 
+	<lib-strlen out="$res" string="$mday"/> 
+	<switch var="$res">
+  	   <case equal="1"> 
+               <lib-strcat out-string="$mday" string="0" string2="$mday"/>
+           </case>
+	</switch>
+<!--  Filenamen bauen --> 
+        <lib-strcat out-string="$res1" string="$mday" string2="$mon"/>
+	<lib-strcat out-string="$res" string="$res1" string2=".txt"/>
+<!--  Schauen ob es das File mit dem Namen gibt  --> 
+	<store-getstat root="" name="$res"  out-error="$error"/>
+	<switch var="$error">
+  	   <case equal="0"> 
+<!--  Feiertag --> 
+		<store-get root="" name="Hday.G711a" out-url="$ctrl" /> 
+		<pbx-prompt url="$ctrl" /> 
+		<store-cookie root="" name="Hday.txt" out="$readday" /> 
+		<lib-strlen string="$readday" out="$res" /> 
+		<switch var="$res">
+  		   <case not-equal="0"> 
+			<pbx-xfer e164="$readday" out-cause="$cause" />
+	           </case>
+		</switch>
+	   </case>
+	   <case not-equal="0"> 
+<!--  Wochentag --> 
+		<store-get root="" name="Wday.G711a" out-url="$ctrl" /> 
+		<pbx-prompt url="$ctrl" /> 
+		<store-cookie root="" name="Wday.txt" out="$readday" /> 
+		<lib-strlen string="$readday" out="$res" /> 
+		<switch var="$res">
+  		   <case not-equal="0"> 
+			<pbx-xfer e164="$readday" out-cause="$cause" />
+	           </case>
+		</switch>
+           </case>
+	</switch>
+	<pbx-disc />
+    </function>
+</voicemail>
+
+<!-- Annual Calendar with VoiceMail XML Script wiki-src/xml/AnnualCal 1,0,0,0 (C) innovaphone AG 2010-2010 -->
